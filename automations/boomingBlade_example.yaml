@@ -1,0 +1,21 @@
+!a import
+- _v: 2
+  name: bb
+  automation:
+    - type: target
+      target: each
+      effects:
+        - type: attack
+          hit:
+            - type: damage
+              damage: 1d8+1[magical piercing]
+          miss: []
+          attackBonus: dexterityMod+proficiencyBonus+1
+    - type: condition
+      condition: lastAttackDidHit
+      onTrue:
+        - type: spell
+          id: 2410
+      onFalse: []
+      errorBehaviour: neither
+  proper: false
