@@ -1,0 +1,21 @@
+!a import
+- _v: 2
+  name: <name of your choice>
+  automation:
+    - type: target
+      target: each
+      effects:
+        - type: attack
+          hit:
+            - type: damage
+              damage: <damage die and bonus>[<bludgeoning/slashing/piercing/other damage type>]
+          miss: []
+          attackBonus: <strengthMod/dexterityMod>+proficiencyBonus
+    - type: condition
+      condition: lastAttackDidHit
+      onTrue:
+        - type: spell
+          id: 2410
+      onFalse: []
+      errorBehaviour: neither
+  proper: false
