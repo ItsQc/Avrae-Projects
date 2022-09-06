@@ -1,0 +1,31 @@
+_v: 2
+name: psiAxe
+automation:
+  - type: target
+    target: each
+    effects:
+      - type: attack
+        hit:
+          - type: damage
+            damage: 1d8 + {strengthMod} [slashing]
+            overheal: false
+          - type: counter
+            counter: "Psionic Power: Psionic Energy"
+            amount: "0"
+            allowOverflow: false
+            errorBehaviour: warn
+          - type: condition
+            condition: lastCounterRemaining > 0
+            onTrue:
+              - type: damage
+                damage: 1d8 + {intelligenceMod} [force]
+                overheal: false
+              - type: counter
+                counter: "Psionic Power: Psionic Energy"
+                amount: "1"
+            onFalse:
+              - type: text
+                text: No uses of Psionic Energy dice left!
+            errorBehaviour: "false"
+        miss: []
+        attackBonus: strengthMod+proficiencyBonus
