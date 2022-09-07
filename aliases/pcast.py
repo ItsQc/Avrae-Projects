@@ -1,9 +1,8 @@
-multiline
 <drac2>
 IDs = load_yaml(get_gvar("e808cf94-12fb-45c4-9fd1-dcaa0d39c841"))
 args = &ARGS&
-cArgs = "&*&"
 spN = "&1&"
+cArgs = ' '.join([f'"{x}"' if ' ' in x else str(x) for x in args[1:] ]) if args else ''
 ch = character()
 sb = character().spellbook
 spN.lower()
@@ -65,5 +64,5 @@ if (not scc) or ig:
     out[1] = out[1] + ft
 else:
     out[-1] = out[-1] + ft
-return f'\n{ctx.prefix}'.join(out)
+return f'{ctx.prefix}'.join(out)
 </drac2>
