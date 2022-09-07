@@ -1,4 +1,4 @@
-Casting works just the same as ``!cast``, including being able to take all the same arguments. Works with ``!prep`` by default.
+Casting works just the same as ``!cast``, including being able to take all the same arguments. Works with ``!prep`` by default. If you expended a spell slot, it pritns a second embed to show your spell slot counters for that level.
 For for further information see ``!help cast`` and ``!help prep``.
 
 Commands:
