@@ -1,5 +1,12 @@
-Casting works just the same as ``!cast``, including being able to take all the same arguments. Works with ``!prep`` by default. If you expended a spell slot, it includes a field to show your spell slot counters for that level.
-This works regardless if you used ``-noprep`` when importing or updating your sheet.
+Cast spells according to what you have prepared with aliases like `` !prep`` by Derixyleth#0636. This collection works regardless if you used ``-noprep`` when importing or updating your sheet.
+
+Find the source code for the alias on [my github repo](https://github.com/ItsQc/Avrae-Projects)
+Photo credit: [Danika Anya](https://unsplash.com/@danika_anya)
+
+-----------
+
+Casting works just the same as ``!cast``, including being able to take all the same arguments and displaying your spell slot counters. Works with the popular ``!prep`` alias by default. If you expended a spell slot, it includes a field to show your spell slot counters for that level.
+This works regardless of using ``-noprep`` when importing or updating your sheet.
 For for further information see ``!help cast`` and ``!help prep``.
 
 Commands:
