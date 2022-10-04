@@ -30,7 +30,8 @@ preps = ch.get_cvar(ch.get_cvar("prepListName"))
 if preps != None:
     if spN in IDs:
         if "-l" in args:
-            sLvl = f'{args[args.index("-l") + 1]}'[0]
+            a = argparse(&ARGS&)
+            slotLevel = a.last('l', 1, int)
             cArgs = cArgs.replace(f" -l {sLvl}", '')
         else:
             sLvl = IDs[spN]['L']
