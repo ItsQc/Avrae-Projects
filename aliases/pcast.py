@@ -1,8 +1,7 @@
-multiline
 <drac2>
 IDs = load_yaml(get_gvar("e808cf94-12fb-45c4-9fd1-dcaa0d39c841"))
 args = &ARGS&
-cArgs = "&*&"
+cArgs = ' '.join([f'"{x}"' if ' ' in x else str(x) for x in args[1:] ]) if args else ''
 spN = "&1&"
 ch = character()
 sb = character().spellbook
@@ -19,6 +18,12 @@ stC = f"Spell Slots\n{sb.slots_str(sLvl)}"
 scc = False
 empty = False
 ig = False
+avraePrepped = False
+sbList = sb.spells
+for spell in sbList:
+    if spell.name == spN:
+        if spell.prepared:
+            avraePrepped = True
 ch.set_cvar_nx("prepListName", "prepared")
 ch.set_cvar_nx(ch.get_cvar("prepListName"), [])
 preps = ch.get_cvar(ch.get_cvar("prepListName"))
@@ -39,7 +44,8 @@ if preps != None:
                     msg = f"""cast "{spN}" -i -l {sLvl} {cArgs}" " """
                     if not ig:
                         sb.use_slot(int(sLvl))
-                        stC = f"Spell Slots\n{sb.slots_str(sLvl)}(- 1)"
+                        if not avraePrepped:
+                        	msg = msg + f''' -f "Spell Slots|{sb.slots_str(sLvl)}"'''
                     scc = True
                 else:
                     msg = f"You don't have {spN} prepared!"
@@ -65,5 +71,5 @@ if (not scc) or ig:
     out[1] = out[1] + ft
 else:
     out[-1] = out[-1] + ft
-return f'\n{ctx.prefix}'.join(out)
+return f'{msg}'
 </drac2>
