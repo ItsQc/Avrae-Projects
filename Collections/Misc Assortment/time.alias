@@ -1,0 +1,4 @@
+embed <drac2>
+stamp = f"<t:{int(time())}:R>"
+return f'-title "Discord Time Code for {stamp}" -desc ``{stamp}``'
+</drac2>

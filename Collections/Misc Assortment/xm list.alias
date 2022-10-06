@@ -1,0 +1,11 @@
+<drac2>
+out = ['embed -desc "xmulti command list retrieval failed!"']
+if get_uvar("xmultiLibrary") != None:
+    library = load_json(get_uvar("xmultiLibrary"))
+    out = []
+    for xmulti in library:
+        out.append(xmulti)
+else:
+    out = 'embed -desc "You have not made any xmulti commands!"'
+return f'embed -desc "Your xmulti commands:\n {", ".join(out)}\n\nUse `!xm details <command>` to see details for individual commands."'
+</drac2>

@@ -1,0 +1,24 @@
+<drac2>
+oldName = "&1&"
+newName =  "&2&"
+out = 'embed -desc "Your xmulti renaming failed!"'
+if "xmultiLibrary" in get_uvars():
+    library = load_json(get_uvar("xmultiLibrary"))
+    args = &ARGS&
+    if oldName in library:
+        xmulti = library[oldName]
+        library.pop(oldName)
+        library[f"{newName}"] = xmulti
+        set_uvar("xmultiLibrary", dump_json(library))
+
+        testLibrary = load_json(get_uvar("xmultiLibrary"))
+        if newName in testLibrary:
+            out = f"embed -desc 'Your xmulti \"{oldName}\" was successfully renamed \"{newName}\"!'"
+                
+    else:
+        out = f"""embed -desc 'No xmulti command with the name \"{oldName}\" found'"""
+else:	
+    out = 'embed -desc "You have not made any xmulti commands!"'
+
+return out
+</drac2>

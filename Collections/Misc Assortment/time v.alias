@@ -1,0 +1,4 @@
+embed <drac2>
+stamp = f"{int(time())}"
+return f'-title "POSIX Timestamp for <t:{stamp}:D> <t:{stamp}:T>" -desc ``{stamp}``'
+</drac2>

@@ -1,0 +1,40 @@
+multiline
+<drac2>
+out = ['embed -desc "Your xmulti command failed!"']
+if "xmultiLibrary" in get_uvars():
+    library = load_json(get_uvar("xmultiLibrary"))
+    out = [""]
+    args = &ARGS&
+    name = args.pop(0)
+    if name in library:
+        out[0] = ""
+        xmulti = library[name]
+        minArgs = int(xmulti["minArgs"])
+        extraArgs = []
+        if len(args) < minArgs:
+            args = xmulti["defaultArgs"]
+        elif len(args) > minArgs:
+            extraArgs = args[minArgs:]
+        for i in range(len(xmulti["lines"])):
+            line = xmulti["lines"][f'{i}']
+            argsInLine = line.count('<')
+            if (line.count('<') == line.count('>')):
+                for j in range(argsInLine):
+                    argMarkerLeft = line.find('<')
+                    argMarkerRight = line.find('>') + 1
+                    markerCharacter = line[argMarkerLeft + 1:argMarkerRight - 1]
+                    if markerCharacter.isnumeric():
+                        argValue = args[int(line[argMarkerLeft + 1:argMarkerRight - 1]) - 1]
+                    else:
+                        argValue = " ".join(extraArgs)
+                        argValue = argValue[1:]
+
+                    line = line.replace(line[argMarkerLeft:argMarkerRight], argValue)
+            out.append(line)
+    else:
+        out.append(f"""embed -desc 'No xmulti command with the name \"{name}\" found'""")
+else:
+    out.append('embed -desc "You have not made any xmulti commands!"')
+    
+return f'\n{ctx.prefix}'.join(out)
+</drac2>

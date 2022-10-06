@@ -1,0 +1,1 @@
+Prints an embed with the POSIX time in seconds for the moment this command was ran. Includes a detailed non-relative description of the time in the title and the POSIX time in seconds, without discord time code formatting, in the body of the embed.

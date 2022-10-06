@@ -1,0 +1,38 @@
+<drac2>
+out = "embed -desc 'Adding the xmulti to your library failed'"
+args = &ARGS&
+name = args.pop(0)
+
+# TODO: Data validation to check if user eally gave a number before error is thrown
+minimumArgs = int(args.pop(0))
+xmulti = {"minArgs": f'{minimumArgs}', "defaultArgs": [], "lines": {}}
+
+if len(args) > minimumArgs:
+    defaults = []
+    for i in range(int(xmulti["minArgs"])):
+    	defaults.append(f'{args.pop(0)}')
+    xmulti["defaultArgs"] = defaults
+
+    for i in range(len(args)):
+        xmulti["lines"][i] = args.pop(0)
+
+    if get_uvar("xmultiLibrary") == None:
+        library = {}
+    else:
+        library = load_json(get_uvar("xmultiLibrary"))
+        if name in library:
+            library.pop(name)
+
+    library[f"{name}"] = xmulti
+    set_uvar("xmultiLibrary", dump_json(library))
+
+    testLibrary = load_json(get_uvar("xmultiLibrary"))
+    if name in testLibrary:
+        out = f"embed -desc 'Your xmulti \"{name}\" was successfully added!'"
+else:
+    msg = 'You did not provide enough arguments.\nYour argument minimum must be equal to the number of default arguments given\n'
+    msg = msg + 'You must have at least one command argument after your default arguments.'
+    out = f"embed -desc '{msg}'"
+
+return out
+</drac2>

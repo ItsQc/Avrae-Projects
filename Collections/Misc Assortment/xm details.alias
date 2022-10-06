@@ -1,0 +1,32 @@
+<drac2>
+out = 'embed -desc "xmulti command retrieval failed!"'
+
+def quoteEscape(textIn):
+    textOut = textIn.replace("'", "\\'")
+    textOut = textOut.replace('"', '\\"')
+    return textOut
+
+if get_uvar("xmultiLibrary") != None:
+    library = load_json(get_uvar("xmultiLibrary"))
+    name = "&1&"
+    if name in library:
+        xmulti = library[name]
+        
+        allDefaults = [""]
+        for i in range(len(xmulti["defaultArgs"])):
+            allDefaults.append(f"""{quoteEscape(xmulti["defaultArgs"][i])}""")
+        defaults = f' '.join(allDefaults)
+        defaults = defaults[1:]
+
+        allLines = [""]
+        for i in range(len(xmulti["lines"])):
+            allLines.append(f"""{quoteEscape(xmulti["lines"][f'{i}'])}""")
+        commands = f'\n'.join(allLines)
+
+        out = f"embed -desc '**Name:** {name}\n**Minimum Arguments:** {xmulti['minArgs']}\n**Default Arguments:** {defaults}\n**Commands:** {commands}'"
+    else:
+        out = f"""embed -desc 'No xmulti command with the name \"{name}\" found'"""
+else:
+    out = 'embed -desc "You have not made any xmulti commands!"'
+return out
+</drac2>
