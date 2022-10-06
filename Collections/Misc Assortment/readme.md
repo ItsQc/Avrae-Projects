@@ -1,0 +1,1 @@
+Relatively simple or niche aliases I have made ~~and are remotely presentable~~ and are barely working enough to share. Instructions may be severely lacking.

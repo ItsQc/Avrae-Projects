@@ -1,0 +1,2 @@
+Exports a legacy xmulti command, from before it was a workshop collection.
+Once exported, you can overwrite it to be compatible again by adjusting the formatting listed by ``!help xm add`` and then adding the new formatted xmulti with the same name to overwrite the old version.

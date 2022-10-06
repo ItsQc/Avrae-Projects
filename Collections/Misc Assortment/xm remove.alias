@@ -1,0 +1,15 @@
+<drac2>
+out = 'embed -desc "xmulti command retrieval failed!"'
+if get_uvar("xmultiLibrary") != None:
+    library = load_json(get_uvar("xmultiLibrary"))
+    name = "&1&"
+    if name in library:
+        library.pop(name)
+        set_uvar("xmultiLibrary", dump_json(library))
+        out = f"embed -desc 'xmulti command \"{name}\" was successfully removed!'"
+    else:
+        out = f"""embed -desc 'No xmulti command with the name \"{name}\" found'"""
+else:
+    out = 'embed -desc "You have not made any xmulti commands!"'
+return out
+</drac2>

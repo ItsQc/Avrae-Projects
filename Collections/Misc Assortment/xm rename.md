@@ -1,0 +1,1 @@
+Renames an xmulti command. ``!xm rename <old name> <new name>``
