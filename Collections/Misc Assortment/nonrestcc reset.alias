@@ -1,0 +1,20 @@
+embed <drac2>
+targ = character()
+if targ != None:
+    isValidTarg = True
+
+out = "-desc 'No Counters Reset'"
+if isValidTarg:
+    resetTypeNoneCounters = ""
+    customCounters = list(targ.consumables)
+    for counter in customCounters:
+        if "Hit Dice" not in counter.name:
+            resetType = counter.reset_on
+            if (resetType == None) or (resetType == "none"):
+                resetAmount = counter.reset().delta
+                ccInfo = counter.full_str().split('\n')
+                valueString = ccInfo[0]
+                resetTypeNoneCounters = resetTypeNoneCounters + f' -f "**{counter.name}**\n{valueString} {resetAmount}"'
+                out = f'''-title "**Resetting non-rest based Custom Counters:**"{resetTypeNoneCounters}'''
+return f'{out}'
+</drac2>

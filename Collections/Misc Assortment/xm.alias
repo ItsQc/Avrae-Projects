@@ -12,10 +12,13 @@ if "xmultiLibrary" in get_uvars():
         minArgs = int(xmulti["minArgs"])
         extraArgs = []
         if len(args) < minArgs:
-            args = xmulti["defaultArgs"]
+            combinedArgs = xmulti["defaultArgs"]
+            for i in range(len(args)):
+                combinedArgs[i] = args[i]
+            args = combinedArgs
         elif len(args) > minArgs:
             extraArgs = args[minArgs:]
-        for i in range(len(xmulti["lines"])):
+        for i in range(len(list(xmulti["lines"]))):
             line = xmulti["lines"][f'{i}']
             argsInLine = line.count('<')
             if (line.count('<') == line.count('>')):
