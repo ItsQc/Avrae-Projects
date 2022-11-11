@@ -5,17 +5,19 @@ retrievalSuccess = False
 isMatch = False
 out = f' -title "{character().name} failed to retrieve their weapons!"'
 error = "Unknown"
+maxKeywords = ["max", "MAX", "Max", "all", "All", "ALL"]
+retrieveAll = False
 if len(argList) > 0:
-    if argList[0].isdecimal():
-        amount = int(argList[0])
+    if (argList[0].isdecimal()) or (argList[0] in maxKeywords):
         ch = character()
         if len(argList) > 1:
             text = ' '.join(argList[1:])
-            text = text.lower().strip(' ')
+            text = text.lower().strip('"').strip("'")
             for counter in character().consumables:
-                if (counter.name.find(text) != -1) and (prefix in counter.name):
-                    ccName = counter.name
+                ccWeapon = counter.name.replace(prefix, '').lower()
+                if (ccWeapon.find(text) != -1) and (prefix in counter.name):
                     isMatch = True
+                    ccName = counter.name
                     break
         else:
             thrownCounters = 0
@@ -32,24 +34,28 @@ if len(argList) > 0:
 
         if isMatch:
             unretrieved = ch.get_cc(ccName)
+            if argList[0] in maxKeywords:
+                amount = unretrieved
+            else:
+                amount = int(argList[0])
             if amount <= unretrieved:
-                out = f' -title "{ch.name} is Retrieving {ccName.strip(prefix)}" -desc "Retrieved: *{amount}*\nLost: *{ch.set_cc(ccName, ch.get_cc(ccName) - amount)}*"'
+                out = f' -title "{ch.name} is Retrieving their Thrown Weapons!" -desc "__**{ccName.strip(prefix)}**__\nRetrieved: **{amount}**\nLost: **{ch.set_cc(ccName, ch.get_cc(ccName) - amount)}**"'
                 ch.set_cc(ccName, 0)
                 retrievalSuccess = True
 
             else:
-                error = f"The amount to retrieve ({amount}) exceeds how many you have thrown ({unretrieved})"
+                error = f"The amount to retrieve ({amount}) exceeds how many ({ccName.strip(prefix)}) you have thrown ({unretrieved})"
         else:
-            error = f"No custom counters matching 'Thrown {ccName}'"
+            error = f"No custom counters matching 'Thrown {text}'"
     else:
         error = "Amount given was not a number!"
 else:
     error = "No arguments given!"
 
 if not retrievalSuccess:
-	out = f' -desc "Error: {error}"'
+    out = f' -desc "{error}"'
 
-return out + f' -footer "{ctx.prefix}help {ctx.alias}"'
+return out + f' -f "``{ctx.prefix}help {ctx.alias}``"'
 </drac2>
 -thumb <image>
 -color <color>
