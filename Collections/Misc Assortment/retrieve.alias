@@ -1,0 +1,55 @@
+embed <drac2>
+prefix = "Thrown "
+argList = &ARGS&
+retrievalSuccess = False
+isMatch = False
+out = f' -title "{character().name} failed to retrieve their weapons!"'
+error = "Unknown"
+if len(argList) > 0:
+    if argList[0].isdecimal():
+        amount = int(argList[0])
+        ch = character()
+        if len(argList) > 1:
+            text = ' '.join(argList[1:])
+            text = text.lower().strip(' ')
+            for counter in character().consumables:
+                if (counter.name.find(text) != -1) and (prefix in counter.name):
+                    ccName = counter.name
+                    isMatch = True
+                    break
+        else:
+            thrownCounters = 0
+            for counter in character().consumables:
+                if (len(counter.name.strip(prefix)) > 0) and (prefix in counter.name):
+                    ccName = counter.name
+                    thrownCounters += 1
+            if thrownCounters == 1:
+                isMatch = True
+            elif thrownCounters > 1:
+                error = f"You did not specify which of your {thrownCounters} thrown weapon counters to retrieve!"
+            else:
+                error = "You do not yet have any thrown weapon counters"
+
+        if isMatch:
+            unretrieved = ch.get_cc(ccName)
+            if amount <= unretrieved:
+                out = f' -title "{ch.name} is Retrieving {ccName.strip(prefix)}" -desc "Retrieved: *{amount}*\nLost: *{ch.set_cc(ccName, ch.get_cc(ccName) - amount)}*"'
+                ch.set_cc(ccName, 0)
+                retrievalSuccess = True
+
+            else:
+                error = f"The amount to retrieve ({amount}) exceeds how many you have thrown ({unretrieved})"
+        else:
+            error = f"No custom counters matching 'Thrown {ccName}'"
+    else:
+        error = "Amount given was not a number!"
+else:
+    error = "No arguments given!"
+
+if not retrievalSuccess:
+	out = f' -desc "Error: {error}"'
+
+return out + f' -footer "{ctx.prefix}help {ctx.alias}"'
+</drac2>
+-thumb <image>
+-color <color>

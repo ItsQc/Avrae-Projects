@@ -1,0 +1,132 @@
+<drac2>
+Snippet_Name = "throw"
+# @ Quincy#3650
+phbThrown = ["Javelin", "Spear", "Dagger", "Handaxe", "Light Hammer", "Dart", "Trident", "Net"]
+phbNotThrown = ['Club', 'Greatclub', 'Mace', 'Quarterstaff', 'Sickle', 'Flail', 'Glaive', 'Greataxe', 'Greatsword', 'Halberd', 'Lance', 'Longsword', 'Maul', 'Morningstar', 'Rapier', 'Scimitar', 'Shortsword', 'Triden', 'War Pick', 'Warhammer', 'Whip']
+matchAsnwerLists = [phbThrown, phbNotThrown]
+ccPrefix = "Thrown "
+
+def thrownCounterMatch(text):
+    ccMatch = ""
+    matchFound = False
+    for counter in character().consumables:
+        if (counter.name.find(text.lower()) != -1) and (ccPrefix in counter.name.lower()):
+            ccMatch = counter.name
+            ccMatch = text.strip(ccPrefix)
+            matchFound = True
+    retun [ccMatch, matchFound]
+
+def weaponNameMatch(text, matchAgainst= matchAsnwerLists):
+    text = text.lower()
+    isMatch = False
+    if len(text) > 2:
+        for item in phbThrown:
+            name = item.lower()
+            if name.find(text) != -1:
+                text = item
+                isMatch = True
+                break
+      if not isMatch:
+        ccResult = thrownCounterMatch(text)
+        if ccResult[1]:
+            text = ccResult[0]
+            isMatch = ccResult[1]
+
+    return [text.title(), isMatch]
+
+if ctx.alias != "cast":
+    argList = &ARGS&
+    userNorageUsed = False # If the command was run with the norage snippet
+    norageSnippet = "norage"
+
+    # Remove common action command arguments to prevent false matches
+    ignoreRemoveArgs = [norageSnippet, "adv", "dis", "ss", "gwm", "reckless"]
+    for ignoredArg in ignoreRemoveArgs:
+        if ignoredArg in argList:
+            argList.remove(ignoredArg)
+            if ignoredArg == norageSnippet:
+                userNorageUsed = True
+    """
+    Snippet name will be grabbed by &ARGS&, removing it for efficency
+    and to prevent a false match.
+    Its index is stored to indicate if the next argument after it
+    Value of -1 signals not of use for the argument list
+    """
+    if Snippet_Name in argList:
+        # No arguments follow it
+        if argList.index(Snippet_Name) < len(argList):
+            postSnippetArgIndex = argList.index(Snippet_Name)
+    else:
+        postSnippetArgIndex = -1
+
+    # Get matches to known
+    matches = []
+    for arg in argList:
+        for weaponList in matchAsnwerLists:
+            argMatch = weaponNameMatch(arg)
+            if argMatch[1]:
+                matches.append(argMatch[0])
+                # Mark the match that came fromthe argument immediately following the snippet
+                break
+
+    if len(matches) > 0:
+        if (len(matches) > 1):
+            """
+            Scoring system to choose the best match. Since &ARGS& grabs all arguments there is a small chance other snippets
+            or arguments of the base command might be incorrectly chosen for the weapon name.
+            Each line below is a tier of ranking for the system. If a tier ranking doesn't pick only one result, filter down and repeat.
+
+            matching an existing custome counter > no matching a custom counter
+            phbthrown match > non phbthown match > no phb match
+            argument immediately after snippet > earlier arguments > later argument
+            """
+
+            # Score Matches
+            bestMatch = ""
+            highestScore = -1
+            for i in range(len(matches)):
+                score = 0
+                if thrownCounterMatch(matches[i])[1]:
+                    score = score + 3
+                if matches[i] in phbThrown:
+                    score = score + 2
+                elif matches[i] in phbNotThrown:
+                    score = score + 1
+                else:
+                    score = 0
+                if (score == highestScore) and (i == postSnippetArgIndex):
+                    # Only the match that came right after the snippet
+                    # beats a match with the same score but lower index
+                    bestMatch = matches[i]
+                elif score > highestScore:
+                    bestMatch = matches[i]
+
+            weapon = bestMatch
+
+        else: # Only one match
+            weapon = matches[0]
+    else:
+        weapon = "Unknown Weapon"
+
+    ch = character()
+    ccName = ccNamePrefix + weapon + 's'
+    ch.create_cc_nx(ccName, 0)
+    out = f'-f "Thrown Weapon Attack|Unretrieved {weapon}s: {ch.set_cc(ccName, ch.get_cc(ccName) + 1)} -footer {ctx.prefix}help retrieve"'
+
+    # Automatically deduct the rage damage if raging
+    if combat() and not userNorageUsed:
+        combatant = combat().get_combatant(ch.name)
+        if combatant != None:
+            if combatant.get_effect("Rage") != None:
+                lvl=int(get('BarbarianLevel',0))
+                if lvl < 1:
+                    rageBonus = 0
+                elif lvl < 9:
+                    rageBonus = 2
+                elif lvl < 16:
+                    rageBonus = 3
+                else:
+                    rageBonus = 4
+                out = out + f" -d -{rageBonus}"
+return out
+</drac2>
