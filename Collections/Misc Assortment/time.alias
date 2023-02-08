@@ -1,4 +1,146 @@
-embed <drac2>
-stamp = f"<t:{int(time())}:R>"
-return f'-title "Discord Time Code for {stamp}" -desc ``{stamp}``'
+embed
+<drac2>
+ALIAS_CALLED_TIME = int(time())
+initialTime = ALIAS_CALLED_TIME
+debugInput = []
+exceedsRounding = 0
+
+
+def debugFormat(name, data):
+	data = str(data)
+	if data.lstrip('-+').isdecimal():
+		if int(data) > 0:
+			data = '+' + data
+	return f"``{name}``:\t{data}"
+
+
+out = f" -footer '{ctx.prefix}help {ctx.alias}'"
+nl = '\n'
+tab = '\t'
+FORMAT_ARG = "format"
+ROUND_ARG = "round"
+START_TIME_ARG = "time"
+VERBOSE_ARG = "v"
+
+SETTINGS_UVAR = "timeCodeSettings"
+UVAR_ACTIVE = "active"
+UVAR_PRESETS = "arg presets"
+
+set_uvar_nx(SETTINGS_UVAR, dump_json({UVAR_ACTIVE:False, VERBOSE_ARG:False, UVAR_PRESETS:{ROUND_ARG:"seconds", FORMAT_ARG:"R"}}))
+settings = load_json(get_uvar(SETTINGS_UVAR))
+presets = settings[UVAR_PRESETS]
+
+FULL_DATE_TIME = "DT"
+using(avraetime="646da5b8-5370-4999-b8c6-1afbd1860ce3")
+discordTimeCodes = avraetime.DISCORD_TIME_FLAGS
+aliasTimeFormatCodes = [FULL_DATE_TIME]
+for flag in discordTimeCodes:
+	aliasTimeFormatCodes.append(discordTimeCodes[flag])
+
+
+def stamp(time: int, code: str = discordTimeCodes.SHORT_DATE_TIME):
+	if code.upper() == FULL_DATE_TIME:
+		return f"{avraetime.discordTimestamp(time, discordTimeCodes.DATE_LONG)} {avraetime.discordTimestamp(time, discordTimeCodes.LONG)}"
+	else:
+		return avraetime.discordTimestamp(time, code)
+
+
+timeArgs = {"years":31536000, "weeks":604800, "days":86400, "hours":3600, "minutes":60, "seconds":1}
+argOptions = {FORMAT_ARG:0, ROUND_ARG:0, START_TIME_ARG:0}
+argOptions = argOptions | timeArgs
+
+argAbbreviation = {}
+for key in list(argOptions):
+	abbrv = key[0] if (key != "hours") else "hr"
+	argAbbreviation[key] = abbrv
+
+def validation(argument, inputdata):
+	validated = {}
+
+	# Un-abbreviations
+	if argument not in argAbbreviation:
+		for word in argAbbreviation:
+			if argument == argAbbreviation[word]:
+				argument = word
+				break
+	if argument == ROUND_ARG:
+		for word in argAbbreviation:
+			if inputdata == argAbbreviation[word]:
+				inputdata = word
+				break
+
+
+	if (argument in timeArgs) or (argument == START_TIME_ARG) or ((argument == ROUND_ARG) and not (inputdata in list(timeArgs))):
+		if inputdata.lstrip('-+').isdecimal():
+			if not ((argument == ROUND_ARG) and (int(inputdata) < 0)):
+				validated[argument] = int(inputdata)
+	elif (argument == FORMAT_ARG) and (inputdata.upper() in aliasTimeFormatCodes):
+		if (inputdata.upper() == discordTimeCodes.RELATIVE) or (inputdata.upper() == FULL_DATE_TIME):
+			inputdata = inputdata.upper()
+		validated[argument] = inputdata
+	elif (argument == ROUND_ARG) and (inputdata in list(timeArgs)):
+		validated[argument] = inputdata
+
+	return validated
+
+
+# Parse for valid args and add presets
+validatedArgs = {}
+parsedArgs = argparse(&ARGS&, parse_ephem=False)
+settings[UVAR_ACTIVE] = settings[UVAR_ACTIVE] and not parsedArgs.get("i", default=False)
+for arg in list(argOptions):
+	match = parsedArgs.last(arg)
+	if match != None:
+		newArg = validation(arg, match)
+		validatedArgs |= newArg
+	elif parsedArgs.last(argAbbreviation[arg]):
+		match = parsedArgs.last(argAbbreviation[arg])
+		newArg = validation(arg, match)
+		validatedArgs |= newArg
+	elif (arg in presets) and settings[UVAR_ACTIVE]:
+		newArg = validation(arg, presets[arg])
+		validatedArgs |= newArg
+
+# Apply recieved args
+if len(validatedArgs) > 0:
+	timeFlag = discordTimeCodes.SHORT_DATE_TIME if not (FORMAT_ARG in validatedArgs) else validatedArgs[FORMAT_ARG]
+
+	if START_TIME_ARG in validatedArgs:
+		initialTime = validatedArgs[START_TIME_ARG]
+
+	targetTime = initialTime
+
+	for key in list(validatedArgs):
+		if key in timeArgs:
+			targetTime = targetTime + (validatedArgs[key] * timeArgs[key])
+
+	if ROUND_ARG in validatedArgs:
+		rounding = str(validatedArgs[ROUND_ARG])
+		if validatedArgs[ROUND_ARG] in list(timeArgs):
+			exceedsRounding = targetTime % timeArgs[rounding]
+		elif rounding.lstrip('-+').isdecimal():
+			exceedsRounding = targetTime % int(rounding)
+
+		targetTime = targetTime - exceedsRounding
+else:
+	targetTime = initialTime
+	timeFlag = discordTimeCodes.RELATIVE
+
+# Debug / Verbose Output
+isVerbose = parsedArgs.get(VERBOSE_ARG, default=False) or (settings[VERBOSE_ARG] and settings[UVAR_ACTIVE])
+if isVerbose:
+	out = f'{out} -f "Generated {stamp(ALIAS_CALLED_TIME, FULL_DATE_TIME)}|``{ALIAS_CALLED_TIME}``"'
+	if len(validatedArgs) > 0:
+		out = f'{out} -f "Unmodified Time: {stamp(initialTime, FULL_DATE_TIME)}|``{initialTime}``"'
+		out = f'{out} -f "Modified Time: {stamp(targetTime, FULL_DATE_TIME)}|``{targetTime}``"'
+		debugInput.append(debugFormat("Time Difference", (exceedsRounding if ROUND_ARG in validatedArgs else 'N/A')))
+
+	debugInput.append(debugFormat("Verbose", isVerbose))
+
+	for arg in list(validatedArgs):
+		debugInput.append(debugFormat(arg, validatedArgs[arg]))
+	out = f'{out} -f "Details|{nl.join(debugInput)}"'
+
+out = f'{out} -f "Time Code for {stamp(targetTime, timeFlag)}|``{stamp(targetTime, timeFlag)}``"'
+return out
 </drac2>
