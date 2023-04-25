@@ -31,21 +31,21 @@ if preps != None:
     if spN in IDs:
         if "-l" in args:
             a = argparse(&ARGS&)
-            slotLevel = a.last('l', 1, int)
+            slotLevel = a.last('l', default=IDs[spN]['L'])
             cArgs = cArgs.replace(f" -l {sLvl}", '')
         else:
             sLvl = IDs[spN]['L']
         if "-i" in cArgs:
             ig = True
-            cArgs = cArgs.replace("-i", "'")
+            cArgs = cArgs.replace("-i", "")
         if (sb.get_slots(sLvl) > 0) or ig:
-            cArgs = {cArgs.lstrip(spN)}
+            cArgs = cArgs.lstrip(spN)
             if sb.can_cast(spN, sLvl)  or ig:
                 if (spN in preps) or ig:
-                    msg = f"""cast "{spN}" -i -l {sLvl} {cArgs}" " """
+                    msg = f"""cast "{spN}" -i -l {sLvl} {cArgs}"""
                     if not ig:
                         if avraePrepped:
-                            msg = f"""cast "{spN}" -l {sLvl} {cArgs}" " """
+                            msg = f"""cast "{spN}" -l {sLvl} {cArgs}"""
                         else:
                             sb.use_slot(int(sLvl))
                             msg = msg + f''' -f "Spell Slots|{sb.slots_str(sLvl)}"'''
