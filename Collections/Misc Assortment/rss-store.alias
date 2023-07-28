@@ -1,0 +1,90 @@
+embed -desc <drac2>
+IDs = load_yaml(get_gvar("e808cf94-12fb-45c4-9fd1-dcaa0d39c841"))
+args = &ARGS&
+cArgs = ' '.join([f'"{x}"' if ' ' in x else str(x) for x in args[1:] ]) if args else ''
+parsedArgs = argparse(args)
+spellName = "&1&"
+spellName.lower()
+if spellName.count('/') < 1:
+    lowerCaseInNames = ["and", "an", "the", "a", "to", "with", "without"]
+    words = spellName.split(" ")
+    for i in range(len(words)):
+        if words[i] not in lowerCaseInNames:
+            words[i] = words[i].capitalize()
+    spellName = " ".join(words)
+else:
+    slashIndex = spellName.index('/')
+    spellName = spellName[:slashIndex + 1].capitalize() + spellName[slashIndex + 1:].capitalize()
+
+# Set to a ring with no spells if the cvar doesn't exist
+emptyRing = {"spells": []}
+character().set_cvar_nx("spellStore", dump_json(emptyRing))
+spellRing = load_json(character().get_cvar("spellStore"))
+storedSpells = spellRing["spells"]
+
+# Get remaining space
+emptySlots = 5
+for spell in storedSpells:
+    emptySlots -= spell["level"]
+
+if spellName in IDs:
+    unrecognizedWarning = ""
+    spellBaseLevel = IDs[spellName]['L']
+else:
+    unrecognizedWarning = "The Unrecognized Spell "
+    spellBaseLevel = 1
+
+# If given a slot level, check if valid
+if "-l" in args:
+    slotSize = parsedArgs.last('l', 1, int)
+
+    # Set minimum slot level spellBaseLevel
+    if slotSize < spellBaseLevel:
+        slotSize = spellBaseLevel
+else:
+    slotSize = spellBaseLevel
+
+# Procede if enough room for the spell
+if slotSize <= emptySlots:
+
+    # Set custom dc if valid
+    dc = None
+    if "-dc" in args:
+        dcMinimum = 5 # 8 + 2 proficiency + (-5) modifier
+        dcMaximum = 35 # Based off a Treantmonk Youtube Video for Highest Spell Save in 5e
+        casterDc = parsedArgs.last('dc', 1, int)
+        if (casterDc >= dcMinimum) and (casterDc <= dcMaximum):
+            dc = casterDc
+        elif (casterDc < dcMinimum):
+            dc = dcMinimum
+
+    # Set custom attack bonus if valid
+    attackBonus = None
+    if "-b" in args:
+        attackBonusMinimum = -3 # 2 proficiency + (-5) modifier
+        attackBonusMaximum = 27 # (-8) + the highest DC from the Treantmonk Youtube Video for Highest Spell Save in 5e
+        casterAttackBonus = parsedArgs.last('b', 1, int)
+        if (casterAttackBonus >= attackBonusMinimum) and (casterAttackBonus <= attackBonusMaximum):
+            attackBonus = casterAttackBonus
+
+    # Add validated spell and update cvar
+    validatedSpell = {"name": spellName, "level": slotSize, "dc": dc, "attack": attackBonus}
+    spellRing["spells"].append(validatedSpell)
+
+    character().set_cvar("spellStore", dump_json(spellRing))
+
+    # Format response embed
+    ordinalAbbreviations = ("", "st", "nd", "rd", "th", "th")
+    embedDesc = f"{unrecognizedWarning}{spellName} ({slotSize}{ordinalAbbreviations[slotSize]} level) has been stored into the Ring of Spell Storing."
+    title = f"Storing {spellName}!"
+
+else:
+    embedDesc = f"There isn't enough room to store {spellName}"
+    title = "Failed to store spell!"
+
+return f''' "{embedDesc}"'''
+</drac2>
+-thumb <image>
+-color <color>
+-title <title>
+-footer "Supplement alias by Quincy#3650 for !rss by MrBrown#6022"
