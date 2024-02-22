@@ -97,8 +97,8 @@
         ch.create_cc_nx(ccName, 0)
         out = f'-f "Thrown Weapon Attack|Unretrieved {weapon}s: {ch.set_cc(ccName, ch.get_cc(ccName) + 1)}" -f "``{ctx.prefix}help retrieve``"'
 
-        # Automatically deduct the rage damage if raging
-        if combat() and not userNorageUsed:
+        # Automatically deduct the rage damage if raging, norage snippet wasn't used and cvar throwAlwaysNorage is FALSE
+        if combat() and not userNorageUsed and not get_cvar(throwAlwaysNoRage, FALSE):
             combatant = combat().get_combatant(ch.name)
             if combatant != None:
                 if combatant.get_effect("Rage") != None:
