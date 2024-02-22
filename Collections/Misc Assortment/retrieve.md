@@ -4,10 +4,10 @@ This alias simply tracks weapons thrown and will tell you how many you lose afte
 **__Alias__**
 
 **Syntax:** ``!retrieve <amount> <weapon name>``
-Examples ``!retrieve all dag``  ``!retrieve 3 javelin`` ``!retrieve max rocks``
+Examples ``!retrieve all dag``  ``!retrieve 3 javelin`` ``!retrieve max rocks`` ``!retrieve half rocks``
 
 
-- ``<amount>`` must be either a number or "max"/"all" if you want to collect all the unretrieved weapons of the counter.
+- ``<amount>`` must be either a number, "max"/"all" if you want to collect all the unretrieved weapons of the counter, or "half" if you want to collect half.
 - ``<weapon name>`` must be at least 3 letters and supports partial matching.
 - The thrown weapon name argument is option if you only have one thrown weapon counter.
 - Omit the "Thrown " part of the counter name, just include the weapon name.
