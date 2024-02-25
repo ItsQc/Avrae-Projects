@@ -6,9 +6,10 @@ isMatch = False
 out = f' -title "{character().name} failed to retrieve their weapons!"'
 error = "Unknown"
 maxKeywords = ["max", "MAX", "Max", "all", "All", "ALL"]
+halfKeywords = ["half", "Half", "HALF"]
 retrieveAll = False
 if len(argList) > 0:
-    if (argList[0].isdecimal()) or (argList[0] in maxKeywords):
+    if (argList[0].isdecimal()) or (argList[0] in (maxKeywords+halfKeywords)):
         ch = character()
         if len(argList) > 1:
             text = ' '.join(argList[1:])
@@ -36,6 +37,8 @@ if len(argList) > 0:
             unretrieved = ch.get_cc(ccName)
             if argList[0] in maxKeywords:
                 amount = unretrieved
+            if argList[0] in halfKeywords:
+                amount = unretrieved//2
             else:
                 amount = int(argList[0])
             if amount <= unretrieved:
