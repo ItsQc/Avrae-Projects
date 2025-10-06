@@ -2,6 +2,7 @@ embed
 <drac2>
 ALIAS_CALLED_TIME = int(time())
 initialTime = ALIAS_CALLED_TIME
+DISCORD_EPOCH = 1420070400000
 debugInput = []
 exceedsRounding = 0
 
@@ -20,6 +21,8 @@ tab = '\t'
 FORMAT_ARG = "format"
 ROUND_ARG = "round"
 START_TIME_ARG = "time"
+LINK_ID_ARG = "link"
+SNOWFLAKE_EPOCH = "epoch"
 VERBOSE_ARG = "v"
 
 SETTINGS_UVAR = "timeCodeSettings"
@@ -45,8 +48,8 @@ def stamp(time: int, code: str = discordTimeCodes.SHORT_DATE_TIME):
 		return avraetime.discordTimestamp(time, code)
 
 
-timeArgs = {"years":31536000, "weeks":604800, "days":86400, "hours":3600, "minutes":60, "seconds":1}
-argOptions = {FORMAT_ARG:0, ROUND_ARG:0, START_TIME_ARG:0}
+timeArgs = {"years":31556952, "weeks":604800, "days":86400, "hours":3600, "minutes":60, "seconds":1}
+argOptions = {FORMAT_ARG:0, ROUND_ARG:0, START_TIME_ARG:0, LINK_ID_ARG:0, SNOWFLAKE_EPOCH:0}
 argOptions = argOptions | timeArgs
 
 argAbbreviation = {}
@@ -70,7 +73,7 @@ def validation(argument, inputdata):
 				break
 
 
-	if (argument in timeArgs) or (argument == START_TIME_ARG) or ((argument == ROUND_ARG) and not (inputdata in list(timeArgs))):
+	if (argument in timeArgs) or (argument == START_TIME_ARG) or (argument == SNOWFLAKE_EPOCH) or ((argument == ROUND_ARG) and not (inputdata in list(timeArgs))):
 		if inputdata.lstrip('-+').isdecimal():
 			if not ((argument == ROUND_ARG) and (int(inputdata) < 0)):
 				validated[argument] = int(inputdata)
@@ -80,6 +83,9 @@ def validation(argument, inputdata):
 		validated[argument] = inputdata
 	elif (argument == ROUND_ARG) and (inputdata in list(timeArgs)):
 		validated[argument] = inputdata
+	elif (argument == LINK_ID_ARG):
+		if inputdata.rstrip('/>').split('/')[-1].isdecimal():
+			validated[argument] = int(inputdata.rstrip('/>').split('/')[-1])
 
 	return validated
 
@@ -107,6 +113,12 @@ if len(validatedArgs) > 0:
 
 	if START_TIME_ARG in validatedArgs:
 		initialTime = validatedArgs[START_TIME_ARG]
+	elif LINK_ID_ARG in validatedArgs:
+		if SNOWFLAKE_EPOCH in validatedArgs:
+			epoch = validatedArgs[SNOWFLAKE_EPOCH]
+		else:
+			epoch = DISCORD_EPOCH
+		initialTime = ((validatedArgs[LINK_ID_ARG] >> 22) + epoch) // 1000
 
 	targetTime = initialTime
 
@@ -129,10 +141,10 @@ else:
 # Debug / Verbose Output
 isVerbose = parsedArgs.get(VERBOSE_ARG, default=False) or (settings[VERBOSE_ARG] and settings[UVAR_ACTIVE])
 if isVerbose:
-	out = f'{out} -f "Generated {stamp(ALIAS_CALLED_TIME, FULL_DATE_TIME)}|``{ALIAS_CALLED_TIME}``"'
+	out = f'{out} -f "Generated {stamp(ALIAS_CALLED_TIME, FULL_DATE_TIME)}|`{ALIAS_CALLED_TIME}`"'
 	if len(validatedArgs) > 0:
-		out = f'{out} -f "Unmodified Time: {stamp(initialTime, FULL_DATE_TIME)}|``{initialTime}``"'
-		out = f'{out} -f "Modified Time: {stamp(targetTime, FULL_DATE_TIME)}|``{targetTime}``"'
+		out = f'{out} -f "Unmodified Time: {stamp(initialTime, FULL_DATE_TIME)}|`{initialTime}`"'
+		out = f'{out} -f "Modified Time: {stamp(targetTime, FULL_DATE_TIME)}|`{targetTime}`"'
 		debugInput.append(debugFormat("Time Difference", (exceedsRounding if ROUND_ARG in validatedArgs else 'N/A')))
 
 	debugInput.append(debugFormat("Verbose", isVerbose))
