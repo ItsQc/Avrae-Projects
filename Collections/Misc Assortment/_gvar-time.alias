@@ -1,0 +1,20 @@
+embed <drac2>
+# Makeshift unit tests for gregorian-unix time gvar
+GVAR = "a2cd0576-5d24-4b36-8795-40586784aee7"
+using(gtime=GVAR)
+EXPECTED = "expected"
+GIVEN = "given"
+nl = '\n'
+
+Tests = {
+	"leapYear": [{GIVEN: 1970, EXPECTED: False}, {GIVEN: 2000, EXPECTED: True,}, {GIVEN: 1800, EXPECTED: False}, {GIVEN: 1604, EXPECTED: True},],
+}
+results = []
+
+# Start tests
+startTime = time()
+
+testTime = time() - startTime
+
+return f'-desc "{nl.join(results)}" -f "Testing time|{testTime}" -f "gvar id|{GVAR}" '
+</drac2>
