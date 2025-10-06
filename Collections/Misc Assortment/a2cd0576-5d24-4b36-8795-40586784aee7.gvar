@@ -3,3 +3,5 @@ Unix Gregorian fuctions and object
 https://github.com/ItsQc/Avrae-Projects/
 '''
 
+def leap_year(year: int):
+	return False

@@ -7,14 +7,32 @@ GIVEN = "given"
 nl = '\n'
 
 Tests = {
-	"leapYear": [{GIVEN: 1970, EXPECTED: False}, {GIVEN: 2000, EXPECTED: True,}, {GIVEN: 1800, EXPECTED: False}, {GIVEN: 1604, EXPECTED: True},],
+    "leap_year": [{GIVEN: 1970, EXPECTED: False}, {GIVEN: 2000, EXPECTED: True,}, {GIVEN: 1800, EXPECTED: False}, {GIVEN: 1604, EXPECTED: True}],
 }
-results = []
+template = ' | '.join(("Result?", "number passed", "total tests", "failed on test #"))
+results = [template]
 
 # Start tests
 startTime = time()
+scores = []
+output = []
+fails = []
+for i in range(len(Tests["leap_year"])):
+    try:
+        test = gtime.leap_year(Tests["leap_year"][i][GIVEN])
+        if test == Tests["leap_year"][i][EXPECTED]: 
+            scores.append(True)
+        else:
+            scores.append(False)
+            fails.append(i)
+            output.append(test)
+    except:
+        scores.append(False)
+        output.append("Caught error")
+        fails.append(test.index(i))
+results.append(' | \t '.join([str(not any(scores)), str(scores.count(True)), str(len(scores)), str(fails)]))
 
 testTime = time() - startTime
 
-return f'-desc "{nl.join(results)}" -f "Testing time|{testTime:4e}" -f "gvar id|{GVAR}" '
+return f'-desc "{nl.join(results)}" -f "Testing time|{testTime:4g}" -f "gvar id|{GVAR}" '
 </drac2>
