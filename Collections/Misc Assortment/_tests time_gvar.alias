@@ -16,5 +16,5 @@ startTime = time()
 
 testTime = time() - startTime
 
-return f'-desc "{nl.join(results)}" -f "Testing time|{testTime}" -f "gvar id|{GVAR}" '
+return f'-desc "{nl.join(results)}" -f "Testing time|{testTime:4e}" -f "gvar id|{GVAR}" '
 </drac2>
