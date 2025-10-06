@@ -3,5 +3,12 @@ Unix Gregorian fuctions and object
 https://github.com/ItsQc/Avrae-Projects/
 '''
 
+'''
+Takes integer of a Gregorian year
+Returns boolean if that year is a leap year
+'''
 def leap_year(year: int):
-	return False
+    '''
+    Leap year: Divisible by four but not by 100, unless also divisible by one hundred.
+    '''
+    return True if (not(year % 4) and ((year % 100) or not (year % 400))) else False

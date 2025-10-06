@@ -9,28 +9,32 @@ nl = '\n'
 Tests = {
     "leap_year": [{GIVEN: 1970, EXPECTED: False}, {GIVEN: 2000, EXPECTED: True,}, {GIVEN: 1800, EXPECTED: False}, {GIVEN: 1604, EXPECTED: True}],
 }
-template = ' | '.join(("Result?", "number passed", "total tests", "failed on test #"))
+template = ' | '.join(("Result?", "number passed", "total tests", "failed for"))
 results = [template]
 
 # Start tests
 startTime = time()
 scores = []
-output = []
+reason = []
 fails = []
 for i in range(len(Tests["leap_year"])):
     try:
         test = gtime.leap_year(Tests["leap_year"][i][GIVEN])
         if test == Tests["leap_year"][i][EXPECTED]: 
             scores.append(True)
+        elif not typeof(test, boolean):
+            scores.append(False)
+            fails.append(i)
+            reason.append(test)
         else:
             scores.append(False)
             fails.append(i)
-            output.append(test)
+            reason.append(Tests["leap_year"][i][GIVEN])
     except:
         scores.append(False)
-        output.append("Caught error")
-        fails.append(test.index(i))
-results.append(' | \t '.join([str(not any(scores)), str(scores.count(True)), str(len(scores)), str(fails)]))
+        reason.append(f'Errored on: {Tests["leap_year"][i][GIVEN]}')
+        fails.append(i)
+results.append(' | \t '.join(["Pass" if all(scores) else "Fail", str(scores.count(True)), str(len(scores)), str(reason)]))
 
 testTime = time() - startTime
 
